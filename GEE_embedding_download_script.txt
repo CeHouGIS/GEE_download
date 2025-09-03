@@ -1,0 +1,160 @@
+// =================================================================================
+// **第一步：定义您所有感兴趣的区域**
+// =================================================================================
+
+// 创建一个包含多个区域对象的列表。
+// 每个对象都包含一个名字 (name) 和一个几何范围 (geometry)。
+// 名字将用于生成独一无二的文件名，避免混淆。
+var regions = [
+  {
+    name: 'Kenya_grid_0_0',
+    geometry: ee.Geometry.Rectangle([33.89, -4.68, 34.39, -4.18])
+  },
+  {
+    name: 'Kenya_grid_0_1',
+    geometry: ee.Geometry.Rectangle([33.89, -4.18, 34.39, -3.6799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_2',
+    geometry: ee.Geometry.Rectangle([33.89, -3.6799999999999997, 34.39, -3.1799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_3',
+    geometry: ee.Geometry.Rectangle([33.89, -3.1799999999999997, 34.39, -2.6799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_4',
+    geometry: ee.Geometry.Rectangle([33.89, -2.6799999999999997, 34.39, -2.1799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_5',
+    geometry: ee.Geometry.Rectangle([33.89, -2.1799999999999997, 34.39, -1.6799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_6',
+    geometry: ee.Geometry.Rectangle([33.89, -1.6799999999999997, 34.39, -1.1799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_7',
+    geometry: ee.Geometry.Rectangle([33.89, -1.1799999999999997, 34.39, -0.6799999999999997])
+  },
+  {
+    name: 'Kenya_grid_0_8',
+    geometry: ee.Geometry.Rectangle([33.89, -0.6799999999999997, 34.39, -0.17999999999999972])
+  },
+  {
+    name: 'Kenya_grid_0_9',
+    geometry: ee.Geometry.Rectangle([33.89, -0.17999999999999972, 34.39, 0.3200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_10',
+    geometry: ee.Geometry.Rectangle([33.89, 0.3200000000000003, 34.39, 0.8200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_11',
+    geometry: ee.Geometry.Rectangle([33.89, 0.8200000000000003, 34.39, 1.3200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_12',
+    geometry: ee.Geometry.Rectangle([33.89, 1.3200000000000003, 34.39, 1.8200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_13',
+    geometry: ee.Geometry.Rectangle([33.89, 1.8200000000000003, 34.39, 2.3200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_14',
+    geometry: ee.Geometry.Rectangle([33.89, 2.3200000000000003, 34.39, 2.8200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_15',
+    geometry: ee.Geometry.Rectangle([33.89, 2.8200000000000003, 34.39, 3.3200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_16',
+    geometry: ee.Geometry.Rectangle([33.89, 3.3200000000000003, 34.39, 3.8200000000000003])
+  },
+  {
+    name: 'Kenya_grid_0_17',
+    geometry: ee.Geometry.Rectangle([33.89, 3.8200000000000003, 34.39, 4.32])
+  },
+  {
+    name: 'Kenya_grid_0_18',
+    geometry: ee.Geometry.Rectangle([33.89, 4.32, 34.39, 4.82])
+  },
+  {
+    name: 'Kenya_grid_0_19',
+    geometry: ee.Geometry.Rectangle([33.89, 4.82, 34.39, 5.32])
+  },
+  {
+    name: 'Kenya_grid_0_20',
+    geometry: ee.Geometry.Rectangle([33.89, 5.32, 34.39, 5.82])
+  },
+  {
+    name: 'Kenya_grid_1_0',
+    geometry: ee.Geometry.Rectangle([34.39, -4.68, 34.89, -4.18])
+  },
+  {
+    name: 'Kenya_grid_1_1',
+    geometry: ee.Geometry.Rectangle([34.39, -4.18, 34.89, -3.6799999999999997])
+  },
+  {
+    name: 'Kenya_grid_1_2',
+    geometry: ee.Geometry.Rectangle([34.39, -3.6799999999999997, 34.89, -3.1799999999999997])
+  },
+  {
+    name: 'Kenya_grid_1_3',
+    geometry: ee.Geometry.Rectangle([34.39, -3.1799999999999997, 34.89, -2.6799999999999997])
+  },
+];
+
+
+// =================================================================================
+// **第二步：设置通用的参数**
+// =================================================================================
+
+// 加载影像集合
+var dataset = ee.ImageCollection('GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL');
+
+// 开始和结束时间
+var date_s = '2023-01-01';
+var date_e = '2024-01-01';
+
+// 下载分辨率
+var resolution = 10;
+
+// 可视化参数
+var visParams = {min: -0.3, max: 0.3, bands: ['A01', 'A16', 'A09']};
+
+
+// =================================================================================
+// **第三步：循环遍历每个区域并创建导出任务**
+// =================================================================================
+
+// 使用 forEach 循环来处理 "regions" 列表中的每一个元素
+regions.forEach(function(region) {
+
+  // 1. 筛选影像
+  // 注意：这里的 filterBounds 使用的是当前循环中的 region.geometry
+  var image = dataset
+  .filterDate(date_s, date_e)
+  .filterBounds(region.geometry)
+  .first();
+
+  // 2. 在地图上显示影像（可选，方便检查）
+  // 为了区分，我们用区域的名字来命名图层
+  Map.addLayer(image, visParams, region.name + ' embeddings');
+  Map.centerObject(region.geometry, 10); // 将地图中心移动到当前区域
+
+  // 3. 为当前区域创建导出任务
+  Export.image.toDrive({
+  image: image,
+  // 在描述和文件名中加入区域名称，以保证每个任务和文件都独一无二
+  description: 'Satellite_Embedding_' + region.name,
+  folder: 'GEE_Exports', // Google Drive 中的文件夹
+  fileNamePrefix: 'Satellite_Embedding_' + region.name, // 文件名前缀
+  scale: resolution,
+  region: region.geometry, // 使用当前循环中的区域范围
+  maxPixels: 1e13
+  });
+});
