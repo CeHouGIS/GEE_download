@@ -1,5 +1,5 @@
 # python /code/GEE_download/unzip_gee_zips.py --image_file_name "Shanghai_time_series"
-# python /code/GEE_download/unzip_gee_zips.py --image_file_name "Africa_grid_-15_10_-10_15"
+# python /code/GEE_download/unzip_gee_zips.py --image_file_name "Africa_grid_-7_8_11_25"
 
 import os
 import zipfile
